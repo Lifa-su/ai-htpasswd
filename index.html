@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI .htpasswd Generator - Create Apache Password Files Online</title>
+<meta name="description" content="Generate .htpasswd files online with bcrypt, MD5 (apr1), and SHA1 encryption. Batch generate multiple users with one click.">
+<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e6f0;--text2:#9498b0;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00cec9;--red:#ff6b6b;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:800px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:.95rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.card h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent2);display:flex;align-items:center;gap:8px}
+.form-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.form-group{flex:1;min-width:150px}
+.form-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+input,select{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.95rem;transition:border-color .2s}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239498b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select option{background:var(--surface2);color:var(--text)}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5b4bd5;transform:translateY(-1px)}
+.btn-success{background:var(--green);color:#0f1117}
+.btn-success:hover{background:#00b5b0}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red)}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.actions{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.user-list{margin-top:16px}
+.user-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-bottom:8px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;gap:8px}
+.user-item .info{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-item .algo{color:var(--accent2);font-size:.75rem;padding:2px 8px;background:rgba(108,92,231,.15);border-radius:4px;white-space:nowrap}
+.output-area{position:relative}
+.output-area pre{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.8;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--green);min-height:60px}
+.copy-btn{position:absolute;top:8px;right:8px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#0f1117;padding:10px 24px;border-radius:8px;font-weight:600;font-size:.9rem;transition:transform .3s ease;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:20px;color:var(--text2);font-size:.9rem}
+.cost-badge{display:inline-block;font-size:.7rem;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle}
+.cost-badge.slow{background:rgba(255,107,107,.15);color:var(--red)}
+.cost-badge.fast{background:rgba(0,206,201,.15);color:var(--green)}
+.htaccess-section{margin-top:8px}
+.htaccess-section summary{cursor:pointer;color:var(--accent2);font-size:.9rem;padding:8px 0;user-select:none}
+.htaccess-section summary:hover{color:var(--accent)}
+footer{text-align:center;padding:30px 0 20px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent2);text-decoration:none}
+@media(max-width:600px){
+  .container{padding:12px}
+  header{padding:24px 0 16px}
+  header h1{font-size:1.5rem}
+  .card{padding:16px}
+  .form-row{flex-direction:column;gap:8px}
+  .form-group{min-width:100%}
+  .actions{flex-direction:column}
+  .actions .btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔐 AI .htpasswd Generator</h1>
+    <p>Generate secure Apache .htpasswd files with multiple encryption algorithms</p>
+  </header>
+
+  <div class="card">
+    <h2>➕ Add User</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="e.g. admin" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="text" id="password" placeholder="e.g. s3cur3P@ss" autocomplete="off">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Algorithm</label>
+        <select id="algorithm">
+          <option value="bcrypt">bcrypt (recommended, most secure)</option>
+          <option value="md5">MD5 apr1 (Apache default)</option>
+          <option value="sha1">SHA1 ({SHA} format)</option>
+        </select>
+      </div>
+      <div class="form-group" id="cost-group">
+        <label>bcrypt Cost</label>
+        <select id="bcrypt-cost">
+          <option value="8">8 <span class="cost-badge fast">fast</span></option>
+          <option value="10" selected>10 (default)</option>
+          <option value="12">12 <span class="cost-badge slow">slower</span></option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="addUser()">Add User</button>
+      <button class="btn btn-ghost" onclick="generateRandom()">🎲 Random Password</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>👥 Users <span id="user-count" style="color:var(--text2);font-size:.85rem"></span></h2>
+    <div id="user-list">
+      <div class="empty-state">No users added yet. Add a user above to get started.</div>
+    </div>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn btn-danger btn-sm" onclick="clearAll()" id="clear-btn" style="display:none">🗑 Clear All</button>
+    </div>
+  </div>
+
+  <div class="card" id="output-card" style="display:none">
+    <h2>📄 Generated .htpasswd</h2>
+    <div class="output-area">
+      <pre id="htpasswd-output"></pre>
+      <button class="btn btn-success btn-sm copy-btn" onclick="copyText('htpasswd-output')">📋 Copy</button>
+    </div>
+
+    <details class="htaccess-section">
+      <summary>📝 .htaccess Configuration Example</summary>
+      <div class="output-area" style="margin-top:8px">
+        <pre id="htaccess-output"></pre>
+        <button class="btn btn-success btn-sm copy-btn" onclick="copyText('htaccess-output')">📋 Copy</button>
+      </div>
+    </details>
+  </div>
+
+  <footer>
+    <p>Built with ❤️ — All encryption runs in your browser. No data sent to any server.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const users = [];
+
+const algoSelect = document.getElementById('algorithm');
+const costGroup = document.getElementById('cost-group');
+algoSelect.addEventListener('change', () => {
+  costGroup.style.display = algoSelect.value === 'bcrypt' ? '' : 'none';
+});
+
+document.getElementById('username').addEventListener('keydown', e => { if(e.key==='Enter') addUser(); });
+document.getElementById('password').addEventListener('keydown', e => { if(e.key==='Enter') addUser(); });
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function generateRandom() {
+  const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
+  let pw = '';
+  const arr = new Uint32Array(16);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < 16; i++) pw += chars[arr[i] % chars.length];
+  document.getElementById('password').value = pw;
+  showToast('Random password generated');
+}
+
+// MD5 apr1 implementation
+function md5apr1(password, salt) {
+  if (!salt) {
+    const s = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    salt = '';
+    const r = new Uint32Array(8);
+    crypto.getRandomValues(r);
+    for (let i = 0; i < 8; i++) salt += s[r[i] % s.length];
+  }
+
+  function md5(input) {
+    const bytes = typeof input === 'string' ? new TextEncoder().encode(input) : input;
+    // MD5 implementation
+    function F(x,y,z){return(x&y)|(~x&z)}
+    function G(x,y,z){return(x&z)|(y&~z)}
+    function H(x,y,z){return x^y^z}
+    function I(x,y,z){return y^(x|~z)}
+    function rotl(x,n){return(x<<n)|(x>>>(32-n))}
+
+    let len = bytes.length;
+    let padded = new Uint8Array(((len+8>>6)+1)*64);
+    padded.set(bytes);
+    padded[len] = 0x80;
+    let bits = len * 8;
+    let dv = new DataView(padded.buffer);
+    dv.setUint32(padded.length - 8, bits & 0xffffffff, true);
+    dv.setUint32(padded.length - 4, Math.floor(bits / 0x100000000), true);
+
+    let a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+    const S = [
+      [7,12,17,22],[5,9,14,20],[4,11,16,23],[6,10,15,21]
+    ];
+    const K = new Uint32Array(64);
+    for(let i=0;i<64;i++) K[i] = Math.floor(Math.abs(Math.sin(i+1))*0x100000000);
+
+    for(let off=0;off<padded.length;off+=64){
+      let M = new Uint32Array(16);
+      for(let j=0;j<16;j++) M[j]=dv.getUint32(off+j*4,true);
+      let a=a0,b=b0,c=c0,d=d0;
+      for(let i=0;i<64;i++){
+        let f,g;
+        if(i<16){f=F(b,c,d);g=i;}
+        else if(i<32){f=G(b,c,d);g=(5*i+1)%16;}
+        else if(i<48){f=H(b,c,d);g=(3*i+5)%16;}
+        else{f=I(b,c,d);g=(7*i)%16;}
+        let tmp=d;d=c;c=b;
+        b=(b+rotl((a+f+K[i]+M[g])>>>0,S[i>>4][i%4]))>>>0;
+        a=tmp;
+      }
+      a0=(a0+a)>>>0;b0=(b0+b)>>>0;c0=(c0+c)>>>0;d0=(d0+d)>>>0;
+    }
+    const result = new Uint8Array(16);
+    new DataView(result.buffer).setUint32(0,a0,true);
+    new DataView(result.buffer).setUint32(4,b0,true);
+    new DataView(result.buffer).setUint32(8,c0,true);
+    new DataView(result.buffer).setUint32(12,d0,true);
+    return result;
+  }
+
+  function concatBytes(...arrays) {
+    let len = arrays.reduce((a,b) => a + b.length, 0);
+    let r = new Uint8Array(len);
+    let off = 0;
+    for (const a of arrays) { r.set(a, off); off += a.length; }
+    return r;
+  }
+
+  const enc = new TextEncoder();
+  const passBytes = enc.encode(password);
+  const saltBytes = enc.encode(salt);
+  const magicBytes = enc.encode('$apr1$');
+
+  // Initial hash
+  let ctx = concatBytes(passBytes, magicBytes, saltBytes);
+  let alt = md5(concatBytes(passBytes, saltBytes, passBytes));
+
+  let plen = password.length;
+  for (let i = plen; i > 0; i -= 16) {
+    ctx = concatBytes(ctx, alt.slice(0, Math.min(i, 16)));
+  }
+
+  for (let i = plen; i > 0; i >>= 1) {
+    if (i & 1) ctx = concatBytes(ctx, new Uint8Array([0]));
+    else ctx = concatBytes(ctx, passBytes.slice(0, 1));
+  }
+
+  let result = md5(ctx);
+
+  for (let i = 0; i < 1000; i++) {
+    let c = new Uint8Array(0);
+    if (i & 1) c = concatBytes(c, passBytes);
+    else c = concatBytes(c, result);
+    if (i % 3) c = concatBytes(c, saltBytes);
+    if (i % 7) c = concatBytes(c, passBytes);
+    if (i & 1) c = concatBytes(c, result);
+    else c = concatBytes(c, passBytes);
+    result = md5(c);
+  }
+
+  const itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  function to64(v, n) {
+    let s = '';
+    while (--n >= 0) { s += itoa64[v & 0x3f]; v >>= 6; }
+    return s;
+  }
+
+  let out = '';
+  out += to64((result[0]<<16)|(result[6]<<8)|result[12], 4);
+  out += to64((result[1]<<16)|(result[7]<<8)|result[13], 4);
+  out += to64((result[2]<<16)|(result[8]<<8)|result[14], 4);
+  out += to64((result[3]<<16)|(result[9]<<8)|result[15], 4);
+  out += to64((result[4]<<16)|(result[10]<<8)|result[5], 4);
+  out += to64(result[11], 2);
+
+  return '$apr1$' + salt + '$' + out;
+}
+
+// SHA1 implementation
+async function sha1Hash(password) {
+  const data = new TextEncoder().encode(password);
+  const hash = await crypto.subtle.digest('SHA-1', data);
+  const b64 = btoa(String.fromCharCode(...new Uint8Array(hash)));
+  return '{SHA}' + b64;
+}
+
+async function hashPassword(password, algo, cost) {
+  switch(algo) {
+    case 'bcrypt':
+      return new Promise((resolve, reject) => {
+        dcodeIO.bcrypt.hash(password, cost, (err, hash) => {
+          if (err) reject(err); else resolve(hash);
+        });
+      });
+    case 'md5':
+      return md5apr1(password);
+    case 'sha1':
+      return await sha1Hash(password);
+  }
+}
+
+async function addUser() {
+  const uEl = document.getElementById('username');
+  const pEl = document.getElementById('password');
+  const username = uEl.value.trim();
+  const password = pEl.value.trim();
+  const algo = algoSelect.value;
+  const cost = parseInt(document.getElementById('bcrypt-cost').value);
+
+  if (!username || !password) {
+    showToast('Please enter both username and password');
+    return;
+  }
+  if (/[:\s]/.test(username)) {
+    showToast('Username cannot contain colons or spaces');
+    return;
+  }
+
+  const btn = document.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Hashing...';
+
+  try {
+    const hash = await hashPassword(password, algo, cost);
+    const algoLabels = { bcrypt: 'bcrypt', md5: 'MD5 apr1', sha1: 'SHA1' };
+    users.push({ username, hash, algo: algoLabels[algo] });
+    renderUsers();
+    uEl.value = '';
+    pEl.value = '';
+    uEl.focus();
+    showToast(`User "${username}" added`);
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Add User';
+  }
+}
+
+function removeUser(idx) {
+  users.splice(idx, 1);
+  renderUsers();
+}
+
+function clearAll() {
+  users.length = 0;
+  renderUsers();
+  showToast('All users cleared');
+}
+
+function renderUsers() {
+  const list = document.getElementById('user-list');
+  const count = document.getElementById('user-count');
+  const clearBtn = document.getElementById('clear-btn');
+  const outputCard = document.getElementById('output-card');
+
+  if (users.length === 0) {
+    list.innerHTML = '<div class="empty-state">No users added yet. Add a user above to get started.</div>';
+    count.textContent = '';
+    clearBtn.style.display = 'none';
+    outputCard.style.display = 'none';
+    return;
+  }
+
+  count.textContent = `(${users.length})`;
+  clearBtn.style.display = '';
+  outputCard.style.display = '';
+
+  list.innerHTML = users.map((u, i) => `
+    <div class="user-item">
+      <span class="info">${escHtml(u.username)}:${escHtml(u.hash)}</span>
+      <span class="algo">${u.algo}</span>
+      <button class="btn btn-danger btn-sm" onclick="removeUser(${i})" title="Remove">✕</button>
+    </div>
+  `).join('');
+
+  // Update output
+  const htpasswd = users.map(u => u.username + ':' + u.hash).join('\n');
+  document.getElementById('htpasswd-output').textContent = htpasswd;
+
+  document.getElementById('htaccess-output').textContent =
+`# Place this .htaccess in the directory you want to protect
+AuthType Basic
+AuthName "Restricted Area"
+AuthUserFile /path/to/.htpasswd
+Require valid-user
+
+# To restrict to specific users:
+# Require user ${users.map(u=>u.username).join(' ')}`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard!');
+  });
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+</body>
+</html>
